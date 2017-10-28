@@ -1,29 +1,37 @@
-import spotipy
-import spotipy.util as util
-
-token = util.prompt_for_user_token(username='mars3725',
-            scope='user-top-read',
-            client_id='1e86238a2330483fad99b6c952b9c874',
-            client_secret='ecbe8234150b4c518940eaee14f8ff36',
-            redirect_uri='http://localhost:8888/callback')
-
-if token:
-    sp = spotipy.Spotify(auth=token)
-    sp.trace = False
-    results = sp.current_user_top_artists(time_range='long_term', limit=10)
-    relatedArtists = []
-    for i, item in enumerate(results['items']):
-        relatedArtists.append(sp.artist_related_artists(item['id']))
-    print(relatedArtists)
-else:
-    print("Can't get token")
-
+import oauth2
+from requests_oauthlib import OAuth2Session
+from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 import facebook
-accessToken = 'EAAELdPpbPooBAB2Oea8GQFHautZCaUgknOVeNxo4b43xsA37nYaB5nazj1w8VsXbcYZBnjrZCm6o4ZCZAoV0x2YyXk9gE1yXH1kiFNtWvvqmyt7mQaZCZBwZBxDABHqh6lZCRwCDbh5ZAZAcd9Kf2NtoB8Dy3hotZA1I0VX9IyyQbRpKGAYYY2Msr12tCWKS2GvwtF8ZD'
-graph = facebook.GraphAPI(access_token=accessToken, version="2.10")
 
-app_id = 1231241241
-canvas_url = 'https://domain.com/that-handles-auth-response/'
-perms = ['manage_pages','publish_pages']
-fb_login_url = graph.auth_url(app_id, canvas_url, perms)
-print(fb_login_url)
+#Login Info
+spotifyClient = '1e86238a2330483fad99b6c952b9c874'
+spotifySecret = 'ecbe8234150b4c518940eaee14f8ff36'
+redirect_uri = 'https://localhost/'
+facebookClient = '294072021106314'
+facebookSecret = 'de82f75a2cd78c875479920b877'
+
+oauth = OAuth2Session(spotifyClient, redirect_uri=redirect_uri, scope='user-top-read')
+authorization_url, state = oauth.authorization_url('https://accounts.spotify.com/authorize')
+
+print('Authorize Spotify at ', authorization_url)
+authorization_response = input('Enter the full callback URL: ')
+
+# OAuth endpoints given in the Facebook API documentation
+authorization_base_url = 'https://www.facebook.com/dialog/oauth'
+token_url = 'https://graph.facebook.com/oauth/access_token'
+
+fb = facebook_compliance_fix(OAuth2Session(facebookClient, redirect_uri=redirect_uri))
+
+# Redirect user to Facebook for authorization
+authorization_url, state = fb.authorization_url(authorization_base_url)
+print('Authorize Facebook at ', authorization_url)
+
+# Get the authorization verifier code from the callback url
+redirect_response = input('Paste the full redirect URL here:')
+
+# Fetch the access token
+facebook.fetch_token(token_url, client_secret=facebookSecret, authorization_response=redirect_response)
+
+# Fetch a protected resource, i.e. user profile
+r = facebook.get('https://graph.facebook.com/me?')
+print(r.content)
