@@ -20,12 +20,23 @@ if token:
     genres = []
     for likedArtist in likedArtists['items']:
         relatedArtists = sp.artist_related_artists(likedArtist['id'])['artists']
-        relatedArtists.append()
+        for relatedArtist in relatedArtists:
+            relatedArtistNames.append(relatedArtist['name'])
         genres.append(likedArtist['genres'])
 else:
     print("Can't get token")
 
-words = "apple banana apple strawberry banana lemon"
-freqs = Counter(words.split())
-print(freqs)
-Counter({'apple': 2, 'banana': 2, 'strawberry': 1, 'lemon': 1})
+artistFreq = Counter(relatedArtistNames).most_common(5)
+genreFreq = Counter(sum(genres, [])).most_common(5)
+
+print(artistFreq)
+print(genreFreq)
+
+searchQueries = []
+
+for item, freq in artistFreq:
+    searchQueries.append(item)
+for item, freq in genreFreq:
+    searchQueries.append(item)
+
+print(searchQueries)
