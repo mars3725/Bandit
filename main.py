@@ -10,8 +10,10 @@ token = util.prompt_for_user_token(username='mars3725',
 if token:
     sp = spotipy.Spotify(auth=token)
     sp.trace = False
-    results = sp.current_user_top_artists(time_range='long_term', limit=50)
+    results = sp.current_user_top_artists(time_range='long_term', limit=10)
+    relatedArtists = []
     for i, item in enumerate(results['items']):
-        print(i, item['name'])
+        relatedArtists.append(sp.artist_related_artists(item['id']))
+    print(relatedArtists)
 else:
     print("Can't get token")
