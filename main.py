@@ -17,3 +17,4 @@ if token:
             relatedArtists.append(newArtist)
 else:
     print("Can't get token")
+print("Found", len(relatedArtists), "related artists")
