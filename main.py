@@ -1,6 +1,6 @@
 import spotipy
 import spotipy.util as util
-import numpy
+
 from collections import Counter
 
 def flatList(list):
@@ -28,9 +28,6 @@ else:
 
 artistFreq = Counter(relatedArtistNames).most_common(5)
 genreFreq = Counter(sum(genres, [])).most_common(5)
-
-print(artistFreq)
-print(genreFreq)
 
 searchQueries = []
 
