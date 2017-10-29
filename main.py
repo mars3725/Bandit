@@ -42,17 +42,15 @@ for item, freq in genreFreq:
 
 print(searchQueries)
 
-oauth = OAuth2Session(client_id=instagramClientID, redirect_uri=redirectUri,
-                          scope='basic')
-authorization_url, state = oauth.authorization_url(
-    'https://api.instagram.com/oauth/authorize/',)
+authorization_url = requests.get('https://api.instagram.com/oauth/authorize/',
+                 params={'client_id': instagramClientID, 'redirect_uri': redirectUri, 'response_type': 'token', 'scope': 'public_content'}).url
 
 print('Authorize Instagram at ', authorization_url)
-authorization_code = input('Enter callback code: ')
 
-token = requests.post('https://api.instagram.com/oauth/access_token',
-              {'client_id': instagramClientID, 'client_secret': instagramSecret,
-               'grant_type': 'authorization_code', 'redirect_uri': redirectUri,
-               'code': authorization_code})
+instagramAccessCode = input('Enter access code here: ')
 
-print(token)
+print(instagramAccessCode)
+
+res = requests.get('https://api.instagram.com/v1/tags/search', params={'access_token': instagramAccessCode, 'q': 'birds'})
+
+print(res)
